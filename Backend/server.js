@@ -26,3 +26,15 @@ app.use("/api", Authrouter);
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
+
+
+// create a middleware for error handling 
+app.use((err, req, res,next)=>{
+   const statusCode= err.status || 500;
+   const message= err.message || "internal server error";
+   return res.status(statusCode).json({
+      success:false,
+      statusCode,
+      message
+   });
+});
