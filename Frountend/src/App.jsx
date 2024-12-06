@@ -1,14 +1,23 @@
-import React from 'react'
-import SignUp from './pages/SignUp'
-import Home from './pages/Home'
+import React from "react";
+import SignUp from "./pages/SignUp";
+import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Login from "./pages/Login";
 
 const App = () => {
   return (
-    <div className=" bg-slate-200">
-      <SignUp/>
-      <Home/>
-    </div>
-  )
-}
+    <BrowserRouter>
+    <Header/>
+      <div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signUp" element={<SignUp />} />
+          <Route path="/login" element={<Login/>} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+};
 
-export default App
+export default App;
