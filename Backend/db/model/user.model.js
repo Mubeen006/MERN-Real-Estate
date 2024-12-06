@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 // create a user model to store user date in db
 const userSchema = new mongoose.Schema({
-    fullname:{
+    username:{
         type:String,
         required:true,
         unique:true

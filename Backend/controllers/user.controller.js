@@ -8,7 +8,7 @@ export const signup = async(req, res, next) => {
     const newuser= new user(data);
     try{
         await newuser.save();
-    res.status(201).send("user created successfully");
+    res.status(201).json("user created successfully");
     }
     catch(error){
         // this is the mdidelweare for error handling , 
