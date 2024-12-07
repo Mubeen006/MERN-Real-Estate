@@ -16,7 +16,7 @@ export const signup = async(req, res, next) => {
     catch(error){
         // this is the mdidelweare for error handling , 
         // Location :: this middle ware is createed in our server file 
-        next(error);
+        next(errorHandler(500, "something went wrong"));
     }
 };
 
@@ -24,6 +24,7 @@ export const login= async(req, res, next) => {
     const data= req.body;
     try {
         const validuser= await user.findOne({email: data.email});
+        //                          this is custom errot which we crete in utils/error.js
         if(!validuser) return next(errorHandler(404, "user not found"));
         const validpassword= bcrypt.compareSync(data.password, validuser.password);
         if (!validpassword) return next(errorHandler(404, "invalid credentials"));
