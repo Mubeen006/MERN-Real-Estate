@@ -1,14 +1,17 @@
 import React from "react";
 import { useState } from "react";
 import { Link , useNavigate } from "react-router-dom";
-
+import {useDispatch, useSelector} from "react-redux";
+import {signInStart,signInSuccess,signInFailure} from "../redux/user/userSlice";
 const Login = () => {
   const [formdata, setFormdata] = useState({});
   //create states one for error and 2nd for loading effect
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(false);did not need to use that insted of this we use gloable state of our reduceer
+  const {loading,error}=useSelector(state=>state.user);
    const navigate = useNavigate();
-
+   // initialize dispatch
+   const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormdata({
       ...formdata,
@@ -19,7 +22,8 @@ const Login = () => {
     e.preventDefault();
     //edited "" add loading effect
     try{
-      setLoading(true);
+      // setLoading(true);// this is first we use 
+      dispatch(signInStart())// this is second we use with react redux
       // backend to store data of the user
       // hare i use proxy which is created in vite.config.js file for localhost
       const res = await fetch("/api/login", {
@@ -32,17 +36,21 @@ const Login = () => {
       });
       const data = await res.json();
       if (data.success === false){
-        setError(data.message);
-        setLoading(false);
+        // setError(data.message); firstly we use both of thate for error
+        // setLoading(false); 
+        dispatch(signInFailure(data.message)); // now we use with react redux
         return;
       }
-      setLoading(false);
-      setError(null);
+      // setLoading(false); previous method
+      // setError(null);
+      dispatch(signInSuccess(data));
       navigate("/");
     }
     catch(error){
-      setLoading(false);
-      setError(error.message);
+      // setLoading(false);
+      // setError(error.message);
+
+      dispatch(signInFailure(error.message));
 
     }
   };
