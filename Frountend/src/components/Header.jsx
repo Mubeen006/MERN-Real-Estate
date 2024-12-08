@@ -6,13 +6,13 @@ const Header = () => {
   // we take information fo current user from userSlice
  const {currentUser} = useSelector(state=>state.user)
   return (
-    <div >
+    <div className="py-5 sticky top-0" >
       <header className="bg-slate-200 shadow-md">
         <div className="flex justify-between items-center max-w-6xl p-4 mx-auto">
            <img src={logo} alt="Logo image" className="w-48 sm:w-56" />
            <Link to="/profile"> 
            {currentUser ? (
-             <img src={currentUser.avatar} alt="Profile" className="h-12 w-12 rounded-full object-cover"/>
+             <img src={currentUser.avatar} alt="Profile" className="h-10 w-10 rounded-full object-cover"/>
            ):<li className="cursor-pointer list-none">Sign-up</li>}
            </Link>
         </div>
