@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link , useNavigate } from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {signInStart,signInSuccess,signInFailure} from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 const Login = () => {
   const [formdata, setFormdata] = useState({});
   //create states one for error and 2nd for loading effect
@@ -78,6 +79,7 @@ const Login = () => {
         <button disabled={loading} className="bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c]">
           {loading ? "loading..." : "LOGIN"}
         </button>
+        <OAuth/>
       </form>
       <div className="flex gap-2 mt-5">
         <p>Dont have an account?</p>
