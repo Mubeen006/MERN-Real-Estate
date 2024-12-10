@@ -4,6 +4,8 @@ const app= express();
 // to send data we need to use middleware of jason 
 app.use(express.json());
 
+// import cookies parser to get the information from cookies
+import cookieParser from "cookie-parser";
 
 // create a mongodb connection
 import mongoose from "mongoose";
@@ -14,6 +16,9 @@ dotenv.config()
  }).catch((error) => {
     console.log(error);
  });
+
+ //cookie parser
+ app.use(cookieParser());
 
  // import user routes to use them
  import Userrouter from "./Routes/user.routes.js";

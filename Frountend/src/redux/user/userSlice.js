@@ -24,10 +24,23 @@ const userSlice = createSlice({
         signInFailure:(state,action)=>{
             state.loading = false;
             state.error = action.payload;// if this is the error which we receive from the backend            
+        },
+
+        // here we create reducer/action for updata user data 
+        updateUserStart:(state)=>{
+            state.loading = true;
+        },
+        updateUserSuccess:(state,action)=>{
+            state.currentUser = action.payload;
+            state.loading=false;
+            state.error = null;
+        },
+        updateUserFailure:(state,action)=>{
+            state.loading = false;
+            state.error = action.payload;
         }
     }
-
 })
 //  need to export funtion/ action and reducer
-export const {signInStart, signInSuccess, signInFailure} = userSlice.actions;
+export const {signInStart, signInSuccess, signInFailure,updateUserFailure,updateUserStart,updateUserSuccess,} = userSlice.actions;
 export default userSlice.reducer;

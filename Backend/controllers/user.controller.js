@@ -45,16 +45,22 @@ export const login= async(req, res, next) => {
 
 // signin with goole controller
 export const googlelogin= async(req, res, next) => {
+    // find if user already exist in our database
     const validuser= await user.findOne({email: req.body.email});
     try {
         if(validuser){ 
+            // then we rigister user and give token
             const  token= jwt.sign({_id: validuser._id}, process.env.jwt_secret);
             const {password:pass, ...rest}= validuser._doc;
             res.cookie("access_token", token,{httpOnly:true}).status(200).json(rest); 
         }
+        // if user is not exist then we create new user
         else   {
+             // as we know goodle di not give us password ,but password is require to create user
+             // so we create dummy password          0-9 a-z     last 8 character 
             const generatedPassword= Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
             const hashedpassword= await bcrypt.hash(generatedPassword, 10);
+            // as user name is like "Muhammad Mubeen" we can not save it as it is , so we spit it base of " " then join it base of ""
             const newuser= new user({username: req.body.name.split(" ").join("").toLowerCase()+ Math.random().toString(36).slice(-4), email: req.body.email, password: hashedpassword, avatar: req.body.photo});
             await newuser.save();
             const token= jwt.sign({_id: newuser._id}, process.env.jwt_secret);
@@ -65,32 +71,33 @@ export const googlelogin= async(req, res, next) => {
         next(error);
     }
 }
-// export const googlelogin= async(req, res, next) => {
-//     try {
-//         // find if user already exist in our database
-//         const validuser= await user.findOne({email: req.body.email});
-//         console.log(validuser);
-//         if(validuser){
-//             // then we rigister user and give token
-//             const token= jwt.sign({_id: validuser._id}, process.env.jwt_secret);
-//             // here we remove password berfore save it to localstorage cookie
-//             const {password:pass, ...rest}= validuser._doc;
-//             res.cookie("access_token", token,{httpOnly:true}).status(200).json(rest); 
-//         }
-//         // if user is not exist then we create new user
-//         else{
-//             // as we know goodle di not give us password ,but password is require to create user
-//             // so we create dummy password          0-9 a-z     last 8 character                    last 16 character
-//             const generatedPassword= Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-//             const hashedpassword= await bcrypt.hash(generatedPassword, 10);
-//             // as user name is like "Muhammad Mubeen" we can not save it as it is , so we spit it base of " " then join it base of ""
-//             const newuser= new user({username: req.body.name.split(" ").join("").toLowerCase()+ Math.random().toString(36).slice(-4), email: req.body.email, password: hashedpassword, avatar: req.body.photo});
-//             await newuser.save();
-//             const token= jwt.sign({_id: newuser._id}, process.env.jwt_secret);
-//             const {password:pass, ...rest}= newuser._doc;
-//             res.cookie("access_token", token,{httpOnly:true}).status(200).json(rest);
-//         }
-//     } catch (error) {  
-//         next(error);
-//     }
-// }
+
+// Update user controller
+export const updateUser= async(req, res, next) => {
+    // we chack here that is user id match to params id
+    if(req.user._id !== req.params.id) return next(errorHandler(401, "you can update only your account"));
+    try {
+        if(req.body.password) {
+            req.body.password= bcrypt.hashSync(req.body.password, 10);
+        }
+
+        const updateduser= await user.findByIdAndUpdate(req.params.id,/*set method is used to check
+            that which fields are changed and only update that fields data in db */ 
+            // {$set: req.body},// this mehod is not good for security
+            {
+                $set:{
+                username: req.body.username,
+                email: req.body.email,
+                password: req.body.password,
+                avatar: req.body.avatar
+            }},
+             // new true is used to return updated data if not use we can get old data
+            {new: true}
+            );
+            // here we remove password before send it as in response
+            const {password:pass, ...rest}= updateduser._doc;
+            res.status(200).json(rest);
+    } catch (error) {
+        next(error);
+    }
+}
