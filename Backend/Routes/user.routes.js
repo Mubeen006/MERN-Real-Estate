@@ -1,5 +1,5 @@
 import express from "express";
-import { updateUser } from "../controllers/user.controller.js";
+import { deleteUser, updateUser } from "../controllers/user.controller.js";
 import { verifyUser } from "../utils/verifyUser.js";
 import upload from "../utils/multerUpload.js";
 
@@ -11,4 +11,6 @@ router.get("/user", (req, res) => {
 
 // Route to update user data 
 router.post("/update/:id", verifyUser, upload.single('file'),updateUser);
+// Route to delete user
+router.delete("/delete/:id", verifyUser, deleteUser);
 export default router;
