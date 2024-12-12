@@ -39,21 +39,21 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        // here we create reducer/action for delete user data
-        deleteUserStart:(state)=>{
+        // here we create reducer/action for delete user
+        logoutUserStart:(state)=>{
             state.loading = true;
         },
-        deleteUserSuccess:(state,action)=>{
+        logoutUserSuccess:(state,action)=>{
             state.currentUser = null;
             state.loading=false;
             state.error = null;
         },
-        deleteUserFailure:(state,action)=>{
+        logoutUserFailure:(state,action)=>{
             state.loading = false;
             state.error = action.payload;
         }
     }
 })
 //  need to export funtion/ action and reducer
-export const {signInStart, signInSuccess, signInFailure,updateUserFailure,updateUserStart,updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure} = userSlice.actions;
+export const {signInStart, signInSuccess, signInFailure,updateUserFailure,updateUserStart,updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure,logoutUserStart,logoutUserSuccess,logoutUserFailure} = userSlice.actions;
 export default userSlice.reducer;

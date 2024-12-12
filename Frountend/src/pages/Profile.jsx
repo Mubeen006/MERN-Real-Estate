@@ -7,7 +7,8 @@ import {
   updateUserFailure,
   deleteUserStart,
   deleteUserSuccess,
-  deleteUserFailure
+  deleteUserFailure,
+  logoutUserStart,logoutUserSuccess,logoutUserFailure
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 const Profile = () => {
@@ -73,6 +74,22 @@ const Profile = () => {
       dispatch(deleteUserFailure(error.message));
     }
   };
+
+  // Logout user 
+  const handleLogout = async (e) => {
+    try {
+      dispatch(logoutUserStart());
+      const res = await fetch("/api/signout")
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(logoutUserFailure(data.message));
+        return;
+      }
+      dispatch(logoutUserSuccess(data));
+    } catch (error) {
+      dispatch(logoutUserFailure(error.message));
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-800">
@@ -136,7 +153,7 @@ const Profile = () => {
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-600 cursor-pointer" onClick={handleDelete}>Delete account</span>
-        <span className="text-red-600 cursor-pointer">Sign out</span>
+        <span className="text-red-600 cursor-pointer"onClick={handleLogout}>Sign out</span>
       </div>
       {error && <p className="text-red-600 mt-5">{error}</p>}
       {updateSuccess && <p className="text-green-600 mt-5">User is updated successfully!</p>}
