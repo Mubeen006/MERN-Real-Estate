@@ -1,34 +1,39 @@
 import { useSelector } from "react-redux";
-import { useRef,useState } from "react";
+import { useRef, useState } from "react";
 // import updateUser reducer from userSlice
-import { updateUserStart, updateUserSuccess, updateUserFailure } from "../redux/user/userSlice";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 const Profile = () => {
-  const { currentUser,loading,error } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
 
   const fileRef = useRef(null);
   const [formdata, setFormdata] = useState({});
   const dispatch = useDispatch();
-
-console.log(formdata)
   const handleChange = (e) => {
     setFormdata({
       ...formdata,
-      [e.target.id]: e.target.value
-    })
+      [e.target.id]: e.target.value,
+    });
   };
-// updata data of usrer
+  // updata data of usrer
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      
+
+      // Prepare form data for the POST request
+      const fdata = new FormData();
+      if (formdata.avatar) fdata.append("file", formdata.avatar);
+      if (formdata.username) fdata.append("username", formdata.username);
+      if (formdata.email) fdata.append("email", formdata.email);
+      if (formdata.password) fdata.append("password", formdata.password);
       const res = await fetch(`/api/update/${currentUser._id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formdata),
+        body: fdata,
       });
       const data = await res.json();
       if (data.success === false) {
@@ -36,25 +41,50 @@ console.log(formdata)
         return;
       }
       dispatch(updateUserSuccess(data));
+       // Set the avatar URL from the backend response to update the UI immediately
+       setFormdata({
+        ...formdata,
+        avatar: data.avatar || currentUser.avatar,
+      });
     } catch (error) {
       dispatch(updateUserFailure(error.message));
-      }
-
-  }
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-800">
         PROFILE
       </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input type="file" id="file" className="hidden" ref={fileRef} accept="image/*" />
-      <img src={formdata.avatar || currentUser.avatar} alt="Profile" onClick={() => fileRef.current.click()} className="h-24 w-24 rounded-full object-cover cursor-pointer self-center mt-2" /* for image use selfcenter to center img */ />
-        
+      <form
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+        className="flex flex-col gap-4"
+      >
+        <input
+          type="file"
+          id="file"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              setFormdata({ ...formdata, avatar: file });
+            }
+          }}
+          className="hidden"
+          ref={fileRef}
+          accept="image/*"
+        />
+        <img
+          src={formdata.avatar || currentUser.avatar}
+          alt="profile image"
+          onClick={() => fileRef.current.click()}
+          className="h-24 w-24 rounded-full object-cover cursor-pointer self-center mt-2" /* for image use selfcenter to center img */
+        />
+
         <input
           type="text"
           placeholder="username"
           id="username"
-          defaultValue={currentUser.username}
+          defaultValue={currentUser.username} 
           className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
           onChange={handleChange}
         />
@@ -73,7 +103,11 @@ console.log(formdata)
           className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
           onChange={handleChange}
         />
-        <button disabled={loading} className="bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c]">
+        <button
+          disabled={loading}
+          className="bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 
+        rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c]"
+        >
           {loading ? "loading..." : "UPDATE"}
         </button>
       </form>

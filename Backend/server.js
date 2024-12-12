@@ -19,7 +19,7 @@ dotenv.config()
 
  //cookie parser
  app.use(cookieParser());
-
+// app.use(express.urlencoded({ extended: false }));
  // import user routes to use them
  import Userrouter from "./Routes/user.routes.js";
  app.use("/api", Userrouter);
