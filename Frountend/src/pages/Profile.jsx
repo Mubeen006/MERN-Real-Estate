@@ -8,7 +8,9 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
-  logoutUserStart,logoutUserSuccess,logoutUserFailure
+  logoutUserStart,
+  logoutUserSuccess,
+  logoutUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 const Profile = () => {
@@ -46,8 +48,8 @@ const Profile = () => {
         return;
       }
       dispatch(updateUserSuccess(data));
-       // Set the avatar URL from the backend response to update the UI immediately
-       setFormdata({
+      // Set the avatar URL from the backend response to update the UI immediately
+      setFormdata({
         ...formdata,
         avatar: data.avatar || currentUser.avatar,
       });
@@ -75,11 +77,11 @@ const Profile = () => {
     }
   };
 
-  // Logout user 
+  // Logout user
   const handleLogout = async (e) => {
     try {
       dispatch(logoutUserStart());
-      const res = await fetch("/api/signout")
+      const res = await fetch("/api/signout");
       const data = await res.json();
       if (data.success === false) {
         dispatch(logoutUserFailure(data.message));
@@ -124,7 +126,7 @@ const Profile = () => {
           type="text"
           placeholder="username"
           id="username"
-          defaultValue={currentUser.username} 
+          defaultValue={currentUser.username}
           className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
           onChange={handleChange}
         />
@@ -152,11 +154,17 @@ const Profile = () => {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-600 cursor-pointer" onClick={handleDelete}>Delete account</span>
-        <span className="text-red-600 cursor-pointer"onClick={handleLogout}>Sign out</span>
+        <span className="text-red-600 cursor-pointer" onClick={handleDelete}>
+          Delete account
+        </span>
+        <span className="text-red-600 cursor-pointer" onClick={handleLogout}>
+          Sign out
+        </span>
       </div>
       {error && <p className="text-red-600 mt-5">{error}</p>}
-      {updateSuccess && <p className="text-green-600 mt-5">User is updated successfully!</p>}
+      {updateSuccess && (
+        <p className="text-green-600 mt-5">User is updated successfully!</p>
+      )}
     </div>
   );
 };
