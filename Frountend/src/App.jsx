@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import Create_Listing from "./pages/Create_Listing";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile /> /* this component is protected*/} />
+            <Route path="/create-listing" element={<Create_Listing />} />
           </Route>
         </Routes>
       </div>
