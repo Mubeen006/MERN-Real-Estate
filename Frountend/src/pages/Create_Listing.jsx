@@ -1,6 +1,28 @@
 import React from "react";
-
+import { useState } from "react";
+import CloudinaryFileUpload from "../components/cloudinaryFileUpload";
 const Create_Listing = () => {
+  const [images, setImages] = useState([]);
+  const [imagesLink,setImagesLink]=useState([]);
+  const [loading, setLoading] = useState(false);
+   
+  // creating function to upload images
+  const handleUpload = async (e) => {
+    try {
+      let arr=[];
+      setLoading(true);
+      for (let i = 0; i < images.length; i++) {
+        const data = await CloudinaryFileUpload(images[i]);
+        arr.push(data);
+      }
+      setLoading(false);
+      setImagesLink(arr);
+    } catch (error) {
+      setLoading(false);
+      console.log(error)
+    }
+    }
+
   return (
     <main className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
@@ -108,22 +130,31 @@ const Create_Listing = () => {
           </p>
           <div className="flex gap-3">
             <input
+              onChange={(e)=>setImages(e.target.files)}
               className="p-3 border border-[#158a7b] rounded"
               type="file"
               id="images"
               accept="image/*"
+              multiple={true}
             />
             <button
+              onClick={handleUpload}
               className="p-3 border border-[#158a7b] rounded uppercase hover:shadow-lg disabled:opacity-80"
               type="button"
+              disabled={loading}
             >
-              Upload
+              {loading ? "Uploading..." : "Upload"}
             </button>
           </div>
+          {imagesLink && imagesLink.length>0 && imagesLink.map(imagesLink=>{
+            return(
+                <img src={imagesLink?.url} key={imagesLink?.publicId} alt="" className="w-40 h-40 object-cover" />
+            ) 
+          })}
           <div>
-            <button
+            <button 
               className="uppercase bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 
-        rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c] w-full disabled:opacity-80"
+              rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c] w-full disabled:opacity-80"
             >
               Create Listing
             </button>

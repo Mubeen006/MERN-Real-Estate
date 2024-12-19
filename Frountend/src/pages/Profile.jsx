@@ -20,6 +20,7 @@ const Profile = () => {
   const fileRef = useRef(null);
   const [formdata, setFormdata] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [profileImage,setProfileImage]=useState(currentUser.avatar);
   const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormdata({
@@ -110,6 +111,7 @@ const Profile = () => {
             const file = e.target.files[0];
             if (file) {
               setFormdata({ ...formdata, avatar: file });
+              setProfileImage(URL.createObjectURL(file));
             }
           }}
           className="hidden"
@@ -117,7 +119,7 @@ const Profile = () => {
           accept="image/*"
         />
         <img
-          src={formdata.avatar || currentUser.avatar}
+          src={profileImage||currentUser.avatar}
           alt="profile image"
           onClick={() => fileRef.current.click()}
           className="h-24 w-24 rounded-full object-cover cursor-pointer self-center mt-2" /* for image use selfcenter to center img */
