@@ -122,7 +122,7 @@ const Profile = () => {
           src={profileImage||currentUser.avatar}
           alt="profile image"
           onClick={() => fileRef.current.click()}
-          className="h-24 w-24 rounded-full object-cover cursor-pointer self-center mt-2" /* for image use selfcenter to center img */
+          className="h-24 w-24 rounded-full object-contain cursor-pointer self-center mt-2" /* for image use selfcenter to center img */
         />
 
         <input

@@ -3,26 +3,55 @@ import { useState } from "react";
 import CloudinaryFileUpload from "../components/cloudinaryFileUpload";
 const Create_Listing = () => {
   const [images, setImages] = useState([]);
-  const [imagesLink,setImagesLink]=useState([]);
+  const [formdata, setFormdata] = useState({
+    imagesLink: [],
+  });
+  const [imageUploadError, setImageUploadError] = useState("");
   const [loading, setLoading] = useState(false);
-   
+
   // creating function to upload images
   const handleUpload = async (e) => {
-    try {
-      let arr=[];
-      setLoading(true);
-      for (let i = 0; i < images.length; i++) {
-        const data = await CloudinaryFileUpload(images[i]);
-        arr.push(data);
+    if(images.length===0){
+      setImageUploadError("Please upload at least one image");
+    }
+    else if(images.length + formdata.imagesLink.length > 6){
+      setImageUploadError("You can upload a maximum of 6 images.");
+    }
+    else{
+      try {
+        setLoading(true);
+        // arry to store cloud images link 
+        let uploadedImages = [];
+        // uploading one by one images to cloud 
+        for (const image of images) {
+          // calling cloudinary function
+          const data = await CloudinaryFileUpload(image);
+          // storing data of uploaded image like Public id and secure url in arry
+          uploadedImages.push(data);
+        }
+        // setting uploaded images link in state
+        setFormdata((prev) => ({
+          ...prev,
+          imagesLink:[...prev.imagesLink,...uploadedImages]
+        }))
+        setImages([]);
+        setImageUploadError("");
+      } catch (error) {
+        setLoading(false);
+        setImageUploadError("Image upload failed. Ensure each image is under 2MB.");
       }
-      setLoading(false);
-      setImagesLink(arr);
-    } catch (error) {
-      setLoading(false);
-      console.log(error)
+      finally {
+        setLoading(false);
+      }
     }
-    }
-
+  };
+// deleting uploaded images from state
+const handleImageDelete=(publicId)=>{
+  setFormdata((prev) => ({
+    ...prev,// Spread the previous state to keep all other properties unchanged
+    imagesLink: prev.imagesLink.filter((image) => image.publicId !== publicId),
+  }))
+}
   return (
     <main className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
@@ -130,7 +159,7 @@ const Create_Listing = () => {
           </p>
           <div className="flex gap-3">
             <input
-              onChange={(e)=>setImages(e.target.files)}
+              onChange={(e) => setImages(e.target.files)}
               className="p-3 border border-[#158a7b] rounded"
               type="file"
               id="images"
@@ -146,13 +175,28 @@ const Create_Listing = () => {
               {loading ? "Uploading..." : "Upload"}
             </button>
           </div>
-          {imagesLink && imagesLink.length>0 && imagesLink.map(imagesLink=>{
-            return(
-                <img src={imagesLink?.url} key={imagesLink?.publicId} alt="" className="w-40 h-40 object-cover" />
-            ) 
-          })}
+          <p>{imageUploadError && <span className="text-red-600 text-sm">{imageUploadError}</span>}</p>
+          {
+            formdata.imagesLink.map((image) => {
+              return (
+                <div key={image.publicId} className="flex justify-between items-center p-3 border border-[#158a7b] rounded-lg">
+                  <img
+                    src={image.url}
+                    alt=""
+                    className="w-20 h-20 object-contain"
+                  />
+                  <button
+                  onClick={() => handleImageDelete(image.publicId)}
+                    type="button"
+                    className="px-3 text-red-700 rounded-lg uppercase hover:opacity-75"
+                  >
+                    Delete
+                  </button>
+                </div>
+              );
+            })}
           <div>
-            <button 
+            <button
               className="uppercase bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 
               rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c] w-full disabled:opacity-80"
             >
