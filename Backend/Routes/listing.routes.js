@@ -4,5 +4,5 @@ import { verifyUser } from "../utils/verifyUser.js";
 
 const router = express.Router();
 
-router.post("/create-listing",verifyUser ,createListing);
+router.post("/createlisting",verifyUser ,createListing);
 export default router;
