@@ -28,6 +28,10 @@ dotenv.config()
 import Authrouter from "./Routes/auth.routes.js";
 app.use("/api", Authrouter);
 
+// import listing router to create listing
+import Listingrouter from "./Routes/listing.routes.js";
+app.use("/api", Listingrouter);
+
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });

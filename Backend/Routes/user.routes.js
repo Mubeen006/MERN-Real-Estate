@@ -5,10 +5,6 @@ import upload from "../utils/multerUpload.js";
 
 const router = express.Router();
 
-router.get("/user", (req, res) => {
-    res.send("Hello World! from router");
-});
-
 // Route to update user data 
 router.post("/update/:id", verifyUser, upload.single('file'),updateUser);
 // Route to delete user
