@@ -1,5 +1,6 @@
 
 import Listing from "../db/model/listing.model.js";
+import { errorHandler } from "../utils/error.js";
 // create a listing controller to create listing
 export const createListing = async (req, res, next) => {
    try {
@@ -8,4 +9,21 @@ export const createListing = async (req, res, next) => {
    } catch (error) {
     next(error)
    } 
+}
+
+// create a controller to access the user created listings
+export const userListings = async (req,res,next)=>{
+   // as we store user id in userRef in db at the time of creating a listin so it make it easy to access user data
+   if (req.user._id===req.params.id){
+      try {
+         const listings=await Listing.find({userRef:req.params.id});
+         res.status(200).json(listings)
+         
+      } catch (error) {
+         next(error)
+      }
+   }
+   else{
+      return next(errorHandler(401,"You can only view your own listings!"));
+   }
 }
