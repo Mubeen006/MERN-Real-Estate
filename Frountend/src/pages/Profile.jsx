@@ -96,7 +96,6 @@ const Profile = () => {
       dispatch(logoutUserFailure(error.message));
     }
   };
-
   // function to show listings of user
   const handleShwoListings = async (e) => {
     try {
@@ -112,6 +111,27 @@ const Profile = () => {
       setShowListingError(true);
     }
   };
+  // function to delete user listing
+  const handleDeleteListing= async(listingId)=>{
+    try {
+      const res=await fetch(`/api/deletelisting/${listingId}`,
+        {
+          method:"DELETE",}
+      );
+      const data=await res.json();
+      if(data.success===false){
+        console.log(data.message);
+        return;
+      }
+      // if listing is deleted successfully we need to update user listing
+      
+      setUserListing((prev)=>prev.filter
+      // here we did not return the deleted listing
+      ((listing)=>listing._id!==listingId));
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-800">
@@ -219,12 +239,12 @@ const Profile = () => {
               </Link>
               <Link
                 to={`/listing/${listing._id}`}
-                className="text-slate-700 flex-1  hover:underline font-semibold truncate"
+                className="text-slate-700 flex-1 hover:underline font-semibold truncate"
               >
                 <p>{listing.title}</p>
               </Link>
               <div className="flex flex-col justify-center">
-                <button className="text-red-700 uppercase">Delete</button>
+                <button onClick = {() => handleDeleteListing(listing._id)} className="text-red-700 uppercase">Delete</button>
                 <button className="text-[#147d6c] uppercase">Edit</button>
               </div>
             </div>

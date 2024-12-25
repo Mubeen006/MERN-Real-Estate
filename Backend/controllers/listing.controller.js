@@ -27,3 +27,20 @@ export const userListings = async (req,res,next)=>{
       return next(errorHandler(401,"You can only view your own listings!"));
    }
 }
+
+// create a controller to delete a listing
+export const deleteListing=async(req,res,next)=>{
+   const listing=await Listing.findById(req.params.id);
+   if (!listing) return next(errorHandler(404,"Listing not found"));
+   if (listing.userRef===req.user._id){
+      try {
+         await listing.deleteOne();
+         res.status(200).json("Listing deleted successfully");
+      } catch (error) {
+         next(error)
+      }
+   }
+   else{
+      return next(errorHandler(401,"You can only delete your own listing!"));
+   }
+}
