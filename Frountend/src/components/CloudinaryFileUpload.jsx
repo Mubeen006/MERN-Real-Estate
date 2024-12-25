@@ -9,7 +9,8 @@ formData.append("upload_preset","User_Avatar");
 try {
     // we send form data to cloudinary in that api  
     const {data}=await axios.post(`https://api.cloudinary.com/v1_1/dvhpnalvq/image/upload`,formData)
-    return {url:data?.secure_url}
+    const url=data?.secure_url
+    return url;
 } catch (error) {
     console.log(error)
 }

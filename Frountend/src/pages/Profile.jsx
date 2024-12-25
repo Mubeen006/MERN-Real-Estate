@@ -20,7 +20,9 @@ const Profile = () => {
   const fileRef = useRef(null);
   const [formdata, setFormdata] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const [profileImage,setProfileImage]=useState(currentUser.avatar);
+  const [profileImage, setProfileImage] = useState(currentUser.avatar);
+  const [showListingError, setShowListingError] = useState(false);
+  const [userListing, setUserListing] = useState([]);
   const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormdata({
@@ -94,6 +96,22 @@ const Profile = () => {
       dispatch(logoutUserFailure(error.message));
     }
   };
+
+  // function to show listings of user
+  const handleShwoListings = async (e) => {
+    try {
+      setShowListingError(false);
+      const res = await fetch(`/api/listings/${currentUser._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        setShowListingError(true);
+        return;
+      }
+      setUserListing(data);
+    } catch (error) {
+      setShowListingError(true);
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-800">
@@ -119,7 +137,7 @@ const Profile = () => {
           accept="image/*"
         />
         <img
-          src={profileImage||currentUser.avatar}
+          src={profileImage || currentUser.avatar}
           alt="profile image"
           onClick={() => fileRef.current.click()}
           className="h-24 w-24 rounded-full object-contain cursor-pointer self-center mt-2" /* for image use selfcenter to center img */
@@ -155,7 +173,12 @@ const Profile = () => {
         >
           {loading ? "loading..." : "UPDATE"}
         </button>
-        <Link to="/create-listing" className="bg-slate-700 text-white p-3 rounded-lg uppercase text-center hover:bg-slate-600">Create Listing</Link>
+        <Link
+          to="/create-listing"
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase text-center hover:bg-slate-600"
+        >
+          Create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-600 cursor-pointer" onClick={handleDelete}>
@@ -167,8 +190,47 @@ const Profile = () => {
       </div>
       {error && <p className="text-red-600 mt-5">{error}</p>}
       {updateSuccess && (
-        <p className="text-green-600 mt-5">User is updated successfully!</p>
+        <p className="text-[#147d6c] mt-5 text-sm">
+          User is updated successfully!
+        </p>
       )}
+      <button
+        onClick={handleShwoListings}
+        className="text-[#147d6c] w-full text-1xl mt-5"
+      >
+        Show Listings
+      </button>
+      <p>{showListingError ? "Error showing listings" : ""}</p>
+      {userListing &&
+        userListing.length > 0 &&
+        <div className="flex flex-col gap-4">
+          <h1 className="text-2xl text-center font-semibold mt-7">Your Listings</h1>
+          {userListing.map((listing) => (
+            <div
+              key={listing._id}
+              className="flex border border-[#147d6c] rounded-lg justify-between items-center gap-4 p-3 mt-3"
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  src={listing.imagesLink[0]}
+                  alt="listing cover"
+                  className="h-16 w-16 object-contain"
+                />
+              </Link>
+              <Link
+                to={`/listing/${listing._id}`}
+                className="text-slate-700 flex-1  hover:underline font-semibold truncate"
+              >
+                <p>{listing.title}</p>
+              </Link>
+              <div className="flex flex-col justify-center">
+                <button className="text-red-700 uppercase">Delete</button>
+                <button className="text-[#147d6c] uppercase">Edit</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        }
     </div>
   );
 };

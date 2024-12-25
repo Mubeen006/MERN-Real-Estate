@@ -42,6 +42,7 @@ const Create_Listing = () => {
           // calling cloudinary function
           const data = await CloudinaryFileUpload(image);
           // storing data of uploaded image like Public id and secure url in arry
+          console.log(data);
           uploadedImages.push(data);
         }
         // setting uploaded images link in state
@@ -320,7 +321,7 @@ const Create_Listing = () => {
                 className="flex justify-between items-center p-3 border border-[#158a7b] rounded-lg"
               >
                 <img
-                  src={image.url}
+                  src={image}
                   alt=""
                   className="w-20 h-20 object-contain"
                 />
