@@ -168,6 +168,8 @@ const Edit_Listing = () => {
             type="text"
             placeholder="Title of the listing"
             id="title"
+            minLength={10}
+            maxLength={60}
             required
             onChange={handleChange}
             value={formdata.title}
@@ -178,6 +180,8 @@ const Edit_Listing = () => {
             placeholder="Description"
             id="description"
             required
+            minLength={30}
+            maxLength={200}
             onChange={handleChange}
             value={formdata.description}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
@@ -186,6 +190,9 @@ const Edit_Listing = () => {
             type="text"
             placeholder="Address"
             id="address"
+            required
+            minLength={10}
+            maxLength={100}
             onChange={handleChange}
             value={formdata.address}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"

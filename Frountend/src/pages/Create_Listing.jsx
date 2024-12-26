@@ -152,6 +152,8 @@ const Create_Listing = () => {
             placeholder="Title of the listing"
             id="title"
             required
+            minLength={10}
+            maxLength={60}
             onChange={handleChange}
             value={formdata.title}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
@@ -161,6 +163,8 @@ const Create_Listing = () => {
             placeholder="Description"
             id="description"
             required
+            minLength={30}
+            maxLength={200}
             onChange={handleChange}
             value={formdata.description}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
@@ -169,6 +173,9 @@ const Create_Listing = () => {
             type="text"
             placeholder="Address"
             id="address"
+            required
+            minLength={10}
+            maxLength={100}
             onChange={handleChange}
             value={formdata.address}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
