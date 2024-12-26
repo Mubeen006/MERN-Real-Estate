@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Create_Listing from "./pages/Create_Listing";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Edit_Listing from "./pages/Edit_Listing";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile /> /* this component is protected*/} />
             <Route path="/create-listing" element={<Create_Listing />} />
+            <Route path="/edit-listing/:listingId" element={<Edit_Listing />} />
           </Route>
         </Routes>
       </div>
