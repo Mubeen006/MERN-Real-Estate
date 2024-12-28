@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Create_Listing from "./pages/Create_Listing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Edit_Listing from "./pages/Edit_Listing";
+import Listing from "./pages/Listing";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/create-listing" element={<Create_Listing />} />
             <Route path="/edit-listing/:listingId" element={<Edit_Listing />} />
           </Route>
+          <Route path="/listing/:listingId" element={<Listing/>} />
         </Routes>
       </div>
     </BrowserRouter>
