@@ -154,3 +154,15 @@ export const signout = async (req, res, next) => {
         next(error)
     }
 }
+
+// controller to get the user
+export const getUser = async (req, res, next) => {
+  try {
+    const User= await user.findById(req.params.id);
+    if(!User) return next(errorHandler(404,"User not found"));
+    const { password: pass, ...rest } = User._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error)
+  }
+}
