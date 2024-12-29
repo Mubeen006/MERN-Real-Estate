@@ -85,7 +85,7 @@ const Profile = () => {
   const handleLogout = async (e) => {
     try {
       dispatch(logoutUserStart());
-      const res = await fetch("/api/signout");
+      const res = await fetch(`/api/signout/${currentUser._id}`);
       const data = await res.json();
       if (data.success === false) {
         dispatch(logoutUserFailure(data.message));

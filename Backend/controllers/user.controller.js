@@ -146,7 +146,9 @@ export const deleteUser = async (req, res, next) => {
 };
 
 // Logout user controller
-export const signout = async (req, res, next) => {
+export const signout = async (req, res, next) => { 
+  if (req.user._id !== req.params.id)
+    return next(errorHandler(401, "User not found"));
     try {
         res.clearCookie("access_token");
         res.status(200).json("user signout successfully");
