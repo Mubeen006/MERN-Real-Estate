@@ -33,7 +33,7 @@ const Header = () => {
            <Link to='/'>
            <img src={logo} alt="Logo image" className="w-48 sm:w-56" />
            </Link>
-           <form onSubmit={handleSubmit} className="border p-2 rounded-lg flex items-center">
+           <form onSubmit={handleSubmit} className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg flex items-center">
             <input type='text' placeholder="Search..." className="bg-transparent shadow-sm focus:outline-none px-1 w-24 sm:w-64"
             value={searchTerm}
             onChange={(e)=>setSearchTerm(e.target.value)}/>

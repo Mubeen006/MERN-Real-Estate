@@ -9,6 +9,7 @@ import Create_Listing from "./pages/Create_Listing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Edit_Listing from "./pages/Edit_Listing";
 import Listing from "./pages/Listing";
+import Search from "./pages/Search";
 
 const App = () => {
   return (
@@ -19,12 +20,13 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signUp" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/listing/:listingId" element={<Listing/>} />
+          <Route path="/search" element={<Search />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile /> /* this component is protected*/} />
             <Route path="/create-listing" element={<Create_Listing />} />
             <Route path="/edit-listing/:listingId" element={<Edit_Listing />} />
           </Route>
-          <Route path="/listing/:listingId" element={<Listing/>} />
         </Routes>
       </div>
     </BrowserRouter>
