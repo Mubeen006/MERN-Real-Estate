@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import ListingItem from "../components/ListingItem";
 const Search = () => {
   const navigate = useNavigate();
   const [searchTermData, setSearchTermData] = useState({
@@ -14,11 +14,9 @@ const Search = () => {
     order: "desc",
   });
 
-  const [loding, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const {currentUser} = useSelector((state) => state.user);
-  console.log(listings);
   // we neet to get data from the url to updata our searchTermData state
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -60,12 +58,11 @@ const Search = () => {
         const res= await fetch(`/api/${currentUser._id}/alllistings?${searchQuery}`);
         const data= await res.json();
         if(data.success===false){
-          setError(true);
           setLoading(false);
+          console.log(data.message);
           return;
         }
         setListings(data);
-        setError(false);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -147,7 +144,7 @@ const Search = () => {
               value={searchTermData.searchTerm}
               onChange={handleChange}
               className=" border-[#147d6c] border-r-2
-                border-b-2 focus:outline-none  rounded-lg w-full p-2"
+                border-b-2 bg-slate-100 focus:outline-none  rounded-lg w-full p-2"
             />
           </div>
           {/* providign serch terms to filter data */}
@@ -159,7 +156,7 @@ const Search = () => {
                 id="all"
                 onChange={handleChange}
                 checked={searchTermData.type === "all"}
-                className="w-5"
+                className="bg-slate w-5"
               />
               <span>Rent & Sele</span>
             </div>
@@ -169,7 +166,7 @@ const Search = () => {
                 id="rent"
                 onChange={handleChange}
                 checked={searchTermData.type === "rent"}
-                className="w-5"
+                className="bg-slate w-5"
               />
               <span>Rent</span>
             </div>
@@ -179,7 +176,7 @@ const Search = () => {
                 id="sale"
                 onChange={handleChange}
                 checked={searchTermData.type === "sale"}
-                className="w-5"
+                className="bg-slate w-5"
               />
               <span>Sele</span>
             </div>
@@ -189,7 +186,7 @@ const Search = () => {
                 id="offer"
                 onChange={handleChange}
                 checked={searchTermData.offer}
-                className="w-5"
+                className=" bg-slate w-5"
               />
               <span>offer</span>
             </div>
@@ -199,23 +196,23 @@ const Search = () => {
             <label className="whitespace-nowrap font-semibold">
               Amenities:
             </label>
-            <div className="flex gap-2">
+            <div className=" bg-slate flex gap-2">
               <input
                 type="checkbox"
                 id="parking"
                 onChange={handleChange}
                 checked={searchTermData.parking}
-                className="w-5"
+                className=" bg-slate w-5"
               />
               <span>Parking</span>
             </div>
-            <div className="flex gap-2">
+            <div className=" bg-slate flex gap-2">
               <input
                 type="checkbox"
                 id="furnished"
                 onChange={handleChange}
                 checked={searchTermData.furnished}
-                className="w-5"
+                className="bg-slate w-5"
               />
               <span>Furnished</span>
             </div>
@@ -227,7 +224,7 @@ const Search = () => {
               id="sort_order"
               onChange={handleChange}
               defaultValue={"created_at_desc"}
-              className=" text-sm border border-[#147d6c] rounded-lg p-2 focus:outline-none focus:border-2"
+              className=" bg-slate-100 text-sm border border-[#147d6c] rounded-lg p-2 focus:outline-none focus:border-2"
             >
               <option value="regularPrice_desc">Price high to low</option>
               <option value="regularPrice_asc">Price low to high</option>
@@ -243,8 +240,22 @@ const Search = () => {
           </button>
         </form>
       </div>
-      <div className="text-2xl font-semibold border-b-2 p-3 text-slate-900 my-5">
-        <h1>Listing results:</h1>
+      {/* Listings Result */}
+      <div className="flex-1">
+        <h1 className="text-2xl font-semibold border-b-2 p-3 text-slate-900 my-5">Listing results:</h1>
+        <div className="p-6 flex flex-wrap gap-4">
+          {/* check if loading and if there is no listing founded */}
+          {!loading && listings.length===0 &&(
+            <p className="text-xl text-slate-700 ">No listing found!</p>
+          )}
+          {loading &&(
+            <p className="text-xl text-slate-700 text-center w-full">Loading...</p>
+          )}
+          {/* now to make cards for each listing */}
+          {!loading && listings && listings.map((listing) => (
+            <ListingItem key={listing._id} listing={listing}/>
+          ))}
+        </div>
       </div>
     </div>
   );
