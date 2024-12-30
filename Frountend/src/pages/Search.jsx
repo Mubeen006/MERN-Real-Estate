@@ -17,6 +17,7 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const {currentUser} = useSelector((state) => state.user);
+  const [showMore, setShowMore] = useState(false);
   // we neet to get data from the url to updata our searchTermData state
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -53,6 +54,7 @@ const Search = () => {
     const fetchListings = async () => {
       try {
         setLoading(true);
+        setShowMore(false);
         // now as we create a search query from tha updated url
         const searchQuery= urlParams.toString();
         const res= await fetch(`/api/${currentUser._id}/alllistings?${searchQuery}`);
@@ -61,6 +63,11 @@ const Search = () => {
           setLoading(false);
           console.log(data.message);
           return;
+        }
+        if(data.length>8){
+          setShowMore(true);
+        }else{
+          setShowMore(false);
         }
         setListings(data);
         setLoading(false);
@@ -128,6 +135,19 @@ const Search = () => {
 
     // now we will navigate to that particular search query
     navigate(`/search?${searchQuery}`);
+  };
+  const handleShowMore = async () => {
+    // firt we need to get number of listings to show listings after that listings 
+    const numberOfListings = listings.length;
+    const startIndex = numberOfListings;
+    const urlParams=new URLSearchParams(location.search);
+    urlParams.set('startIndex', startIndex);
+    const searchQuery=urlParams.toString();
+    const res= await fetch(`/api/${currentUser._id}/alllistings?${searchQuery}`);
+    const data= await res.json();
+    if(data.length<9){
+      setShowMore(false);}
+    setListings([...listings, ...data]);
   };
   return (
     <div className="flex flex-col md:flex-row">
@@ -255,6 +275,9 @@ const Search = () => {
           {!loading && listings && listings.map((listing) => (
             <ListingItem key={listing._id} listing={listing}/>
           ))}
+          {showMore && (
+            <button onClick={handleShowMore} className="text-[#147d6c] hover:underline p-6 text-center w-full">Show more</button>
+          )}
         </div>
       </div>
     </div>
