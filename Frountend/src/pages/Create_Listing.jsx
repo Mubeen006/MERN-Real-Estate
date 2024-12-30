@@ -134,7 +134,7 @@ const Create_Listing = () => {
     }
     setLoading(false);
     setError(false);
-    navigate("/listings");
+    navigate(`/listing/${data._id}`);
    } catch (error) {
     setError(error.message);
     setLoading(false);
