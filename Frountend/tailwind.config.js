@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'myFont': ['myFont'],
+        'myFont2': ['myFont2'],
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/line-clamp'),

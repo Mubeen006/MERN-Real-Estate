@@ -57,7 +57,7 @@ const Search = () => {
         setShowMore(false);
         // now as we create a search query from tha updated url
         const searchQuery= urlParams.toString();
-        const res= await fetch(`/api/${currentUser._id}/alllistings?${searchQuery}`);
+        const res= await fetch(`/api/data/alllistings?${searchQuery}`);
         const data= await res.json();
         if(data.success===false){
           setLoading(false);
@@ -143,7 +143,7 @@ const Search = () => {
     const urlParams=new URLSearchParams(location.search);
     urlParams.set('startIndex', startIndex);
     const searchQuery=urlParams.toString();
-    const res= await fetch(`/api/${currentUser._id}/alllistings?${searchQuery}`);
+    const res= await fetch(`/api/data/alllistings?${searchQuery}`);
     const data= await res.json();
     if(data.length<9){
       setShowMore(false);}

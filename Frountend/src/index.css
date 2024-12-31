@@ -5,3 +5,15 @@
 body {
     background-color: rgb(241, 245, 241);
 }
+
+@font-face{
+    font-family: 'myFont';
+    src: './assets/font/myfont.ttf';
+}
+
+@font-face {
+	font-family: 'myFont2';
+	src: url('./assets/font/Bradobrei.woff2') format('woff2'), url('./assets/font/Bradobrei.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+}

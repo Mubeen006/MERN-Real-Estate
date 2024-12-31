@@ -22,5 +22,5 @@ router.post("/updatelisting/:id", verifyUser, updateListing);
 // get the listing data by id, we did not need to use verify user middleware because every one can view listing
 router.get("/getlisting/:id", getListing);
 // get all listings data
-router.get("/:id/alllistings", getListings);
+router.get("/data/alllistings", getListings);
 export default router;
