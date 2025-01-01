@@ -73,7 +73,7 @@ const Create_Listing = () => {
   const handleChange = (e) => {
     // as we know our form data have multiple types of inputs, we need to target it seperatly
     // type is one of them
-    if (e.target.id === "sell" || e.target.id === "rent") {
+    if (e.target.id === "sale" || e.target.id === "rent") {
       setFormdata({
         ...formdata,
         type: e.target.id,
@@ -184,12 +184,12 @@ const Create_Listing = () => {
             <div className="flex gap-2">
               <input
                 type="checkbox"
-                id="sell"
+                id="sale"
                 className="w-5"
                 onChange={handleChange}
-                checked={formdata.type === "sell"}
+                checked={formdata.type === "sale"}
               />
-              <span>Sell</span>
+              <span>Sale</span>
             </div>
             <div className="flex gap-2">
               <input

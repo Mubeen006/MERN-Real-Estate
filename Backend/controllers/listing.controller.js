@@ -92,10 +92,10 @@ export const getListings = async (req, res, next) => {
     if (parking === undefined || parking === "false") {
       parking = { $in: [true, false] };
     }
-    // if there is no type is defined then get both rent and sell listings
+    // if there is no type is defined then get both rent and sale listings
     let type = req.query.type;
     if (type === undefined || type === "all") {
-      type = { $in: ["rent", "sell"] };
+      type = { $in: ["rent", "sale"] };
     }
     // to provide filter search term
     let searchTerm = req.query.searchTerm || ""; // '' if ther is now search term use provide all listings to

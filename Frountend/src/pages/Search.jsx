@@ -178,7 +178,7 @@ const Search = () => {
                 checked={searchTermData.type === "all"}
                 className="bg-slate w-5"
               />
-              <span>Rent & Sele</span>
+              <span>Rent & Sale</span>
             </div>
             <div className="flex gap-2">
               <input
@@ -198,7 +198,7 @@ const Search = () => {
                 checked={searchTermData.type === "sale"}
                 className="bg-slate w-5"
               />
-              <span>Sele</span>
+              <span>Sale</span>
             </div>
             <div className="flex gap-2">
               <input
