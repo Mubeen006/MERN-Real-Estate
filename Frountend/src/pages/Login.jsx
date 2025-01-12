@@ -1,18 +1,22 @@
 import React from "react";
 import { useState } from "react";
-import { Link , useNavigate } from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {signInStart,signInSuccess,signInFailure} from "../redux/user/userSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 const Login = () => {
   const [formdata, setFormdata] = useState({});
   //create states one for error and 2nd for loading effect
   // const [error, setError] = useState(null);
   // const [loading, setLoading] = useState(false);did not need to use that insted of this we use gloable state of our reduceer
-  const {loading,error}=useSelector(state=>state.user);
-   const navigate = useNavigate();
-   // initialize dispatch
-   const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  // initialize dispatch
+  const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormdata({
       ...formdata,
@@ -22,9 +26,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     //edited "" add loading effect
-    try{
-      // setLoading(true);// this is first we use 
-      dispatch(signInStart())// this is second we use with react redux
+    try {
+      // setLoading(true);// this is first we use
+      dispatch(signInStart()); // this is second we use with react redux
       // backend to store data of the user
       // hare i use proxy which is created in vite.config.js file for localhost
       const res = await fetch("/api/login", {
@@ -36,9 +40,9 @@ const Login = () => {
         body: JSON.stringify(formdata),
       });
       const data = await res.json();
-      if (data.success === false){
+      if (data.success === false) {
         // setError(data.message); firstly we use both of thate for error
-        // setLoading(false); 
+        // setLoading(false);
         dispatch(signInFailure(data.message)); // now we use with react redux
         return;
       }
@@ -46,13 +50,11 @@ const Login = () => {
       // setError(null);
       dispatch(signInSuccess(data));
       navigate("/");
-    }
-    catch(error){
+    } catch (error) {
       // setLoading(false);
       // setError(error.message);
 
       dispatch(signInFailure(error.message));
-
     }
   };
 
@@ -76,10 +78,13 @@ const Login = () => {
           required
           onChange={handleChange}
         />
-        <button disabled={loading} className="bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c]">
+        <button
+          disabled={loading}
+          className="bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c]"
+        >
           {loading ? "loading..." : "LOGIN"}
         </button>
-        <OAuth/>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>Dont have an account?</p>

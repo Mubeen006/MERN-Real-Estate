@@ -112,26 +112,28 @@ const Profile = () => {
     }
   };
   // function to delete user listing
-  const handleDeleteListing= async(listingId)=>{
+  const handleDeleteListing = async (listingId) => {
     try {
-      const res=await fetch(`/api/deletelisting/${listingId}`,
-        {
-          method:"DELETE",}
-      );
-      const data=await res.json();
-      if(data.success===false){
+      const res = await fetch(`/api/deletelisting/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
         console.log(data.message);
         return;
       }
       // if listing is deleted successfully we need to update user listing
-      
-      setUserListing((prev)=>prev.filter
-      // here we did not return the deleted listing
-      ((listing)=>listing._id!==listingId));
+
+      setUserListing((prev) =>
+        prev.filter(
+          // here we did not return the deleted listing
+          (listing) => listing._id !== listingId
+        )
+      );
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-800">
@@ -221,10 +223,11 @@ const Profile = () => {
         Show Listings
       </button>
       <p>{showListingError ? "Error showing listings" : ""}</p>
-      {userListing &&
-        userListing.length > 0 &&
+      {userListing && userListing.length > 0 && (
         <div className="flex flex-col gap-4">
-          <h1 className="text-2xl text-center font-semibold mt-7">Your Listings</h1>
+          <h1 className="text-2xl text-center font-semibold mt-7">
+            Your Listings
+          </h1>
           {userListing.map((listing) => (
             <div
               key={listing._id}
@@ -244,15 +247,22 @@ const Profile = () => {
                 <p>{listing.title}</p>
               </Link>
               <div className="flex flex-col items-center ">
-                <button onClick = {() => handleDeleteListing(listing._id)} className="text-red-700 uppercase hover:text-red-500">Delete</button>
+                <button
+                  onClick={() => handleDeleteListing(listing._id)}
+                  className="text-red-700 uppercase hover:text-red-500"
+                >
+                  Delete
+                </button>
                 <Link to={`/edit-listing/${listing._id}`}>
-                <button className="text-[#147d6c] uppercase hover:text-[#14a390]">Edit</button>
+                  <button className="text-[#147d6c] uppercase hover:text-[#14a390]">
+                    Edit
+                  </button>
                 </Link>
               </div>
             </div>
           ))}
         </div>
-        }
+      )}
     </div>
   );
 };

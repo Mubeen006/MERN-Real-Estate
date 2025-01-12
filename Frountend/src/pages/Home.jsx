@@ -101,12 +101,17 @@ const Home = () => {
         </Swiper>
       )}
       {/* listings results for sales and rent */}
-      <div className="max-w-6xl mx-auto p-3 flex-col gap-8 my-10"> 
+      <div className="max-w-6xl mx-auto p-3 flex-col gap-8 my-10">
         {offerListings && offerListings.length > 0 && (
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-myFont">Recent offers</h2>
-              <Link className="text-blue-800 text-sm hover:underline font-myFont" to={`/search?offer=true`}>Show more offers...</Link>
+              <Link
+                className="text-blue-800 text-sm hover:underline font-myFont"
+                to={`/search?offer=true`}
+              >
+                Show more offers...
+              </Link>
             </div>
             <div className="flex flex-wrap gap-3 ">
               {offerListings.map((listing, index) => (
@@ -119,7 +124,12 @@ const Home = () => {
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-myFont">Recent places for rent</h2>
-              <Link className="text-blue-800 text-sm hover:underline font-myFont" to={`/search?type=rent`}>Show more places for rent...</Link>
+              <Link
+                className="text-blue-800 text-sm hover:underline font-myFont"
+                to={`/search?type=rent`}
+              >
+                Show more places for rent...
+              </Link>
             </div>
             <div className="flex flex-wrap gap-3 ">
               {rentListings.map((listing, index) => (
@@ -132,7 +142,12 @@ const Home = () => {
           <div className="">
             <div className="my-3">
               <h2 className="text-2xl font-myFont">Recent places for sale</h2>
-              <Link className="text-blue-800 text-sm hover:underline font-myFont" to={`/search?type=sale`}>Show more places for sale...</Link>
+              <Link
+                className="text-blue-800 text-sm hover:underline font-myFont"
+                to={`/search?type=sale`}
+              >
+                Show more places for sale...
+              </Link>
             </div>
             <div className="flex flex-wrap gap-3 ">
               {saleListings.map((listing, index) => (

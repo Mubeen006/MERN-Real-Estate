@@ -4,7 +4,7 @@ import { app } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 const OAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

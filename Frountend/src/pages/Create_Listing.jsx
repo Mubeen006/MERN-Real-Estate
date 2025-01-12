@@ -1,11 +1,11 @@
 import React from "react";
-import { useState} from "react";
+import { useState } from "react";
 import CloudinaryFileUpload from "../components/cloudinaryFileUpload";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 const Create_Listing = () => {
   const navigate = useNavigate();
-  const {currentUser}=useSelector(state=>state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const [images, setImages] = useState([]);
   const [formdata, setFormdata] = useState({
     imagesLink: [],
@@ -24,49 +24,48 @@ const Create_Listing = () => {
   const [imageUploadError, setImageUploadError] = useState("");
   const [error, setError] = useState(false);
   const [imageUpLoading, setImageUpLoading] = useState(false);
-  const [loading, setLoading]=useState(false);
+  const [loading, setLoading] = useState(false);
 
   // creating function to upload images
   const handleUpload = async (e) => {
     if (images.length === 0) {
-      return setImageUploadError("Please upload at least one image");}
-   if (images.length + formdata.imagesLink.length > 6) {
+      return setImageUploadError("Please upload at least one image");
+    }
+    if (images.length + formdata.imagesLink.length > 6) {
       return setImageUploadError("You can upload a maximum of 6 images.");
     }
-      try {
-        setImageUpLoading(true);
-        // arry to store cloud images link
-        let uploadedImages = [];
-        // uploading one by one images to cloud
-        for (const image of images) {
-          // calling cloudinary function
-          const data = await CloudinaryFileUpload(image);
-          // storing data of uploaded image like Public id and secure url in arry
-          console.log(data);
-          uploadedImages.push(data);
-        }
-        // setting uploaded images link in state
-        setFormdata((prev) => ({
-          ...prev,
-          imagesLink: [...prev.imagesLink, ...uploadedImages],
-        }));
-        setImageUploadError("");
-      } catch (error) {
-        setImageUpLoading(false);
-        setImageUploadError(
-          "Image upload failed. Ensure each image is under 2MB."
-        );
-      } finally {
-        setImageUpLoading(false);
+    try {
+      setImageUpLoading(true);
+      // arry to store cloud images link
+      let uploadedImages = [];
+      // uploading one by one images to cloud
+      for (const image of images) {
+        // calling cloudinary function
+        const data = await CloudinaryFileUpload(image);
+        // storing data of uploaded image like Public id and secure url in arry
+        console.log(data);
+        uploadedImages.push(data);
       }
+      // setting uploaded images link in state
+      setFormdata((prev) => ({
+        ...prev,
+        imagesLink: [...prev.imagesLink, ...uploadedImages],
+      }));
+      setImageUploadError("");
+    } catch (error) {
+      setImageUpLoading(false);
+      setImageUploadError(
+        "Image upload failed. Ensure each image is under 2MB."
+      );
+    } finally {
+      setImageUpLoading(false);
+    }
   };
   // deleting uploaded images from state
   const handleImageDelete = (index) => {
     setFormdata((prev) => ({
       ...prev, // Spread the previous state to keep all other properties unchanged
-      imagesLink: prev.imagesLink.filter(
-        (_,i) => i!== index
-      ),
+      imagesLink: prev.imagesLink.filter((_, i) => i !== index),
     }));
   };
   // update form data state
@@ -79,7 +78,7 @@ const Create_Listing = () => {
         type: e.target.id,
       });
     }
-    // this is our boolean data 
+    // this is our boolean data
     if (
       e.target.id === "parking" ||
       e.target.id === "furnished" ||
@@ -91,55 +90,53 @@ const Create_Listing = () => {
       });
     }
     // remaining data are number and text and textarea
-    if(
+    if (
       e.target.type === "number" ||
       e.target.type === "text" ||
       e.target.type === "textarea"
-    ){
+    ) {
       setFormdata({
         ...formdata,
-        [e.target.id]: e.target.value
+        [e.target.id]: e.target.value,
       });
     }
   };
   // submit form data to backend
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   try {
-    // checking if at last one image is uploaded
-    if(formdata.imagesLink.length===0){
-      setError("Please upload at least one image");
-      return;
-    }
-    // checking if discounted price is less than regular price otherwise may b regular price is less than discounted price
-    if(+formdata.regularPrice<+formdata.discountPrice){
-     return setError("Discounted price should be less than Regular price");
-    }
-    setLoading(true);
-    setError(false);
-    const response= await fetch("/api/createlisting",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({...formdata,
-        userRef:currentUser._id
-      })
-    });
-    const data=await response.json();
-    if(data.success===false){
-      setError(data.message);
+    try {
+      // checking if at last one image is uploaded
+      if (formdata.imagesLink.length === 0) {
+        setError("Please upload at least one image");
+        return;
+      }
+      // checking if discounted price is less than regular price otherwise may b regular price is less than discounted price
+      if (+formdata.regularPrice < +formdata.discountPrice) {
+        return setError("Discounted price should be less than Regular price");
+      }
+      setLoading(true);
+      setError(false);
+      const response = await fetch("/api/createlisting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formdata, userRef: currentUser._id }),
+      });
+      const data = await response.json();
+      if (data.success === false) {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
       setLoading(false);
-      return;
+      setError(false);
+      navigate(`/listing/${data._id}`);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
     }
-    setLoading(false);
-    setError(false);
-    navigate(`/listing/${data._id}`);
-   } catch (error) {
-    setError(error.message);
-    setLoading(false);
-   }
-  }
+  };
   return (
     <main className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
@@ -272,22 +269,22 @@ const Create_Listing = () => {
                 <span className="text-xs">($ / month)</span>
               </div>
             </div>
-            {formdata.offer&&(
-            <div className="flex gap-2 items-center">
-              <input
-                type="number"
-                id="discountPrice"
-                min={0}
-                max={10000000}
-                onChange={handleChange}
-                value={formdata.discountPrice}
-                className="p-1 rounded-lg focus:outline-none border border-[#158a7b] focus:border-2"
-              />
-              <div className="flex flex-col items-center">
-                <p>Discounted price</p>
-                <span className="text-xs">($ / month)</span>
+            {formdata.offer && (
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min={0}
+                  max={10000000}
+                  onChange={handleChange}
+                  value={formdata.discountPrice}
+                  className="p-1 rounded-lg focus:outline-none border border-[#158a7b] focus:border-2"
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discounted price</p>
+                  <span className="text-xs">($ / month)</span>
+                </div>
               </div>
-            </div>  
             )}
           </div>
         </div>
@@ -321,17 +318,13 @@ const Create_Listing = () => {
               <span className="text-red-600 text-sm">{imageUploadError}</span>
             )}
           </p>
-          {formdata.imagesLink.map((image,index) => {
+          {formdata.imagesLink.map((image, index) => {
             return (
               <div
                 key={index}
                 className="flex justify-between items-center p-3 border border-[#158a7b] rounded-lg"
               >
-                <img
-                  src={image}
-                  alt=""
-                  className="w-20 h-20 object-contain"
-                />
+                <img src={image} alt="" className="w-20 h-20 object-contain" />
                 <button
                   onClick={() => handleImageDelete(index)}
                   type="button"
@@ -344,7 +337,7 @@ const Create_Listing = () => {
           })}
           <div>
             <button
-            disabled={loading || imageUpLoading}
+              disabled={loading || imageUpLoading}
               className="uppercase bg-gradient-to-r from-[#147d6c] to-[#14a390] text-white p-3 
               rounded-lg hover:bg-gradient-to-r hover:from-[#14a390] hover:to-[#147d6c] w-full disabled:opacity-80"
             >
