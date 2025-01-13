@@ -35,7 +35,7 @@ const Header = () => {
           </Link>
           <form
             onSubmit={handleSubmit}
-            className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg flex items-center"
+            className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg flex items-center hidden sm:inline"
           >
             <input
               type="text"
@@ -66,6 +66,23 @@ const Header = () => {
               )}
             </Link>
           </div>
+        </div>
+        <div className="flex justify-between items-center max-w-6xl p-4 mx-auto sm:hidden">
+        <form
+            onSubmit={handleSubmit}
+            className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg flex items-center w-full justify-between" 
+          >
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent botder-none focus:outline-none px-1 w-24 sm:w-64"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button>
+              <FaSearch className="text-slate-500 " />
+            </button>
+          </form>
         </div>
       </header>
     </div>
