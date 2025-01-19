@@ -3,9 +3,64 @@ import { errorHandler } from "../utils/error.js";
 // create a listing controller to create listing
 export const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create(req.body);
+    // Extract data from request body
+    const {
+      title,
+      description,
+      address,
+      country,
+      state,
+      city,
+      type,
+      regularPrice,
+      discountPrice,
+      bathrooms,
+      bedrooms,
+      parking,
+      furnished,
+      offer,
+      imagesLink,
+      userRef
+    } = req.body;
+
+    // Validate discountPrice if offer is true
+    if (offer && discountPrice >= regularPrice) {
+      return res.status(400).json({
+        message: "Discount price must be less than regular price when an offer is active."
+      });
+    }
+
+    // Ensure imagesLink contains at least one valid URL
+    if (!Array.isArray(imagesLink) || imagesLink.length === 0) {
+      return res.status(400).json({
+        message: "At least one valid image URL is required."
+      });
+    }
+
+    // Create a new listing instance
+    const listing = await Listing.create({
+      title,
+      description,
+      address,
+      country,
+      state,
+      city,
+      type,
+      regularPrice,
+      discountPrice,
+      bathrooms,
+      bedrooms,
+      parking,
+      furnished,
+      offer,
+      imagesLink,
+      userRef
+    });
+
+    // Send success response
     return res.status(201).json(listing);
   } catch (error) {
+    // Handle errors
     next(error);
   }
 };

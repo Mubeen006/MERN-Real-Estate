@@ -35,7 +35,7 @@ const Header = () => {
           </Link>
           <form
             onSubmit={handleSubmit}
-            className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg flex items-center hidden sm:inline"
+            className=" border-[#147d6c] border-r-2 border-b-2 p-2 rounded-lg items-center hidden sm:inline"
           >
             <input
               type="text"
