@@ -3,6 +3,8 @@ import { useState } from "react";
 import CloudinaryFileUpload from "../components/cloudinaryFileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import Select from "react-select";
+import { Country, State, City } from "country-state-city";
 const Edit_Listing = () => {
   const navigate = useNavigate();
   // to get listing id from url use useParams hook
@@ -13,6 +15,9 @@ const Edit_Listing = () => {
     imagesLink: [],
     title: "",
     description: "",
+    country: null,
+    state: null,
+    city: null,
     address: "",
     type: "rent",
     bedrooms: 1,
@@ -28,10 +33,27 @@ const Edit_Listing = () => {
   const [imageUpLoading, setImageUpLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const getCountries = () =>
+    Country.getAllCountries().map((country) => ({
+      value: country.isoCode,
+      label: country.name,
+    }));
+
+  const getStates = (countryCode) =>
+    State.getStatesOfCountry(countryCode).map((state) => ({
+      value: state.isoCode,
+      label: state.name,
+    }));
+
+  const getCities = (countryCode, stateCode) =>
+    City.getCitiesOfState(countryCode, stateCode).map((city) => ({
+      value: city.name,
+      label: city.name,
+    }));
+
   // as when we click on edit listing button we need listing data on this page,
   // so we use useEffect to get listing data
   useEffect(() => {
-    // as we did not use async await in useEffect so we need to use async function
     const fetchListingData = async () => {
       const res = await fetch(`/api/getlisting/${listingId}`);
       const data = await res.json();
@@ -39,10 +61,68 @@ const Edit_Listing = () => {
         console.log(data.message);
         return;
       }
-      setFormdata(data);
+  
+      // Process location data to convert strings to Select-compatible objects
+      const countryName = data.country;
+      const stateName = data.state;
+      const cityName = data.city;
+  
+      let countryObj = null;
+      let stateObj = null;
+      let cityObj = null;
+  
+      // Find country
+      if (countryName) {
+        const foundCountry = Country.getAllCountries().find(
+          (country) => country.name === countryName
+        );
+        if (foundCountry) {
+          countryObj = {
+            value: foundCountry.isoCode,
+            label: foundCountry.name,
+          };
+  
+          // Find state
+          if (stateName) {
+            const foundState = State.getStatesOfCountry(foundCountry.isoCode).find(
+              (state) => state.name === stateName
+            );
+            if (foundState) {
+              stateObj = {
+                value: foundState.isoCode,
+                label: foundState.name,
+              };
+  
+              // Find city
+              if (cityName) {
+                const foundCity = City.getCitiesOfState(
+                  foundCountry.isoCode,
+                  foundState.isoCode
+                ).find((city) => city.name === cityName);
+                if (foundCity) {
+                  cityObj = {
+                    value: foundCity.name,
+                    label: foundCity.name,
+                  };
+                }
+              }
+            }
+          }
+        }
+      }
+  
+      // Update formdata with processed location objects
+      setFormdata({
+        ...data,
+        country: countryObj,
+        state: stateObj,
+        city: cityObj,
+      });
     };
+  
     fetchListingData();
-  }, []);
+  }, [listingId]);
+
   // creating function to upload images
   const handleUpload = async (e) => {
     if (images.length === 0) {
@@ -118,6 +198,16 @@ const Edit_Listing = () => {
       });
     }
   };
+  // update form data state
+  const handleLocationChange = (field, value) => {
+    setFormdata((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "country" && { state: null, city: null }),
+      ...(field === "state" && { city: null }),
+    }));
+  };
+
   // submit form data to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,6 +221,10 @@ const Edit_Listing = () => {
       if (+formdata.regularPrice < +formdata.discountPrice) {
         return setError("Discounted price should be less than Regular price");
       }
+      // check if country data is not filled
+      if (!formdata.country || !formdata.state || !formdata.city) {
+        return setError("Please select a valid country, state, and city.");
+      }
       setLoading(true);
       setError(false);
       const response = await fetch(`/api/updatelisting/${listingId}`, {
@@ -138,7 +232,13 @@ const Edit_Listing = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formdata, userRef: currentUser._id }),
+        body: JSON.stringify({
+          ...formdata,
+          userRef: currentUser._id,
+          country: formdata.country?.label,
+          state: formdata.state?.label,
+          city: formdata.city?.label,
+        }),
       });
       const data = await response.json();
       if (data.success === false) {
@@ -182,6 +282,145 @@ const Edit_Listing = () => {
             onChange={handleChange}
             value={formdata.description}
             className="border border-[#158a7b] p-3 rounded-lg focus:outline-none focus:border-2"
+          />
+          {/* selection fields for country state and city */}
+          <Select
+            options={getCountries()}
+            value={formdata.country}
+            onChange={(value) => handleLocationChange("country", value)}
+            placeholder="Select Country"
+            isClearable
+            required
+            className="rounded-lg"
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                border: state.isFocused
+                  ? "2px solid #158a7b"
+                  : "1px solid #158a7b",
+                boxShadow: "none", // Removes default focus ring
+                padding: "8px", // Equivalent to Tailwind's `p-3`
+                borderRadius: "0.5rem",
+                backgroundColor: "white", // Ensures a clean background
+                "&:hover": {
+                  border: state.isFocused
+                    ? "2px solid #158a7b"
+                    : "1px solid #158a7b", // Removes hover border change
+                },
+              }),
+              option: (provided) => ({
+                ...provided,
+                backgroundColor: "white", // Consistent white background
+                color: "black",
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "white", // No hover effect
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                border: "1px solid #158a7b",
+                borderRadius: "0.5rem",
+              }),
+              singleValue: (provided) => ({
+                ...provided,
+                color: "black", // Text color of the selected value
+              }),
+            }}
+          />
+          <Select
+            options={formdata.country ? getStates(formdata.country.value) : []}
+            value={formdata.state}
+            onChange={(value) => handleLocationChange("state", value)}
+            placeholder="Select State"
+            isClearable
+            required
+            isDisabled={!formdata.country}
+            className="rounded-lg"
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                border: state.isFocused
+                  ? "2px solid #158a7b"
+                  : "1px solid #158a7b",
+                boxShadow: "none",
+                padding: "8px", // Tailwind `p-3`
+                borderRadius: "0.5rem",
+                backgroundColor: state.isDisabled ? "#f9f9f9" : "white", // Lighter background for disabled state
+                "&:hover": {
+                  border: state.isFocused
+                    ? "2px solid #158a7b"
+                    : "1px solid #158a7b",
+                },
+              }),
+              option: (provided) => ({
+                ...provided,
+                backgroundColor: "white",
+                color: "black",
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "white", // No hover effect
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                border: "1px solid #158a7b",
+                borderRadius: "0.5rem",
+              }),
+              singleValue: (provided) => ({
+                ...provided,
+                color: "black",
+              }),
+            }}
+          />
+          <Select
+            options={
+              formdata.country && formdata.state
+                ? getCities(formdata.country.value, formdata.state.value)
+                : []
+            }
+            value={formdata.city}
+            onChange={(value) => handleLocationChange("city", value)}
+            placeholder="Select City"
+            isClearable
+            required
+            isDisabled={!formdata.state}
+            className="rounded-lg"
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                border: state.isFocused
+                  ? "2px solid #158a7b"
+                  : "1px solid #158a7b",
+                boxShadow: "none",
+                padding: "8px", // Tailwind `p-3`
+                borderRadius: "0.5rem",
+                backgroundColor: state.isDisabled ? "#f9f9f9" : "white",
+                "&:hover": {
+                  border: state.isFocused
+                    ? "2px solid #158a7b"
+                    : "1px solid #158a7b",
+                },
+              }),
+              option: (provided) => ({
+                ...provided,
+                backgroundColor: "white",
+                color: "black",
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "white",
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                border: "1px solid #158a7b",
+                borderRadius: "0.5rem",
+              }),
+              singleValue: (provided) => ({
+                ...provided,
+                color: "black",
+              }),
+            }}
           />
           <input
             type="text"
