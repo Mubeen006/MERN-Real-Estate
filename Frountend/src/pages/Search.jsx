@@ -2,15 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ListingItem from "../components/ListingItem";
+import Select from "react-select";
+import { Country, State, City } from "country-state-city";
 const Search = () => {
   const navigate = useNavigate();
   const [searchTermData, setSearchTermData] = useState({
     searchTerm: "",
+    country: null,
+    state: null,
+    city: null,
     type: "all",
     offer: false,
     parking: false,
     furnished: false,
-    sort: "created_at",
+    sort: "createdAt",
     order: "desc",
   });
 
@@ -18,19 +23,74 @@ const Search = () => {
   const [listings, setListings] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const [showMore, setShowMore] = useState(false);
+
+  // getting country state and city data
+  const getCountries = () =>
+    Country.getAllCountries().map((country) => ({
+      value: country.isoCode,
+      label: country.name,
+    }));
+
+  const getStates = (countryCode) =>
+    State.getStatesOfCountry(countryCode).map((state) => ({
+      value: state.isoCode,
+      label: state.name,
+    }));
+
+  const getCities = (countryCode, stateCode) =>
+    City.getCitiesOfState(countryCode, stateCode).map((city) => ({
+      value: city.name,
+      label: city.name,
+    }));
+
+  const handleLocationChange = (field, value) => {
+    setSearchTermData((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "country" && { state: null, city: null }),
+      ...(field === "state" && { city: null }),
+    }));
+  };
   // we neet to get data from the url to updata our searchTermData state
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
+    const countryFromUrl = urlParams.get("country");
+    const stateFromUrl = urlParams.get("state");
+    const cityFromUrl = urlParams.get("city");
     const typeFromUrl = urlParams.get("type");
     const offerFromUrl = urlParams.get("offer");
     const parkingFromUrl = urlParams.get("parking");
     const furnishedFromUrl = urlParams.get("furnished");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
+    // Convert URL strings to Select option objects
+    let countryObj = null;
+    if (countryFromUrl) {
+      countryObj =
+        getCountries().find((c) => c.label === countryFromUrl) || null;
+    }
+
+    let stateObj = null;
+    if (countryObj && stateFromUrl) {
+      stateObj =
+        getStates(countryObj.value).find((s) => s.label === stateFromUrl) ||
+        null;
+    }
+
+    let cityObj = null;
+    if (countryObj && stateObj && cityFromUrl) {
+      cityObj =
+        getCities(countryObj.value, stateObj.value).find(
+          (c) => c.label === cityFromUrl
+        ) || null;
+    }
     // in case of chage in anyone of these values
     if (
       searchTermFromUrl ||
+      countryFromUrl ||
+      stateFromUrl ||
+      cityFromUrl ||
       typeFromUrl ||
       offerFromUrl ||
       parkingFromUrl ||
@@ -41,11 +101,14 @@ const Search = () => {
       // we will updata our searchTermData state
       setSearchTermData({
         searchTerm: searchTermFromUrl || "",
+        country: countryObj || "",
+        state: stateObj || "",
+        city: cityObj || "",
         type: typeFromUrl || "all",
         offer: offerFromUrl === "true" ? true : false,
         parking: parkingFromUrl === "true" ? true : false,
         furnished: furnishedFromUrl === "true" ? true : false,
-        sort: sortFromUrl || "created_at",
+        sort: sortFromUrl || "createdAt",
         order: orderFromUrl || "desc",
       });
     }
@@ -117,10 +180,16 @@ const Search = () => {
   //create a submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-
     // first we need to set information for the URL
     const urlParams = new URLSearchParams();
     urlParams.set("searchTerm", searchTermData.searchTerm);
+    // Only add location params if they exist
+    if (searchTermData.country?.label)
+      urlParams.set("country", searchTermData.country.label);
+    if (searchTermData.state?.label)
+      urlParams.set("state", searchTermData.state.label);
+    if (searchTermData.city?.label)
+      urlParams.set("city", searchTermData.city.label);
     urlParams.set("type", searchTermData.type);
     urlParams.set("offer", searchTermData.offer);
     urlParams.set("parking", searchTermData.parking);
@@ -165,6 +234,153 @@ const Search = () => {
               className=" border-[#147d6c] border-r-2
                 border-b-2 bg-slate-100 focus:outline-none  rounded-lg w-full p-2"
             />
+          </div>
+          <div className="flex">
+            {/* selection fields for country state and city */}
+            <div className="flex flex-col items-center gap-2">
+              <Select
+                options={getCountries()}
+                value={searchTermData.country}
+                onChange={(value) => handleLocationChange("country", value)}
+                placeholder="Select Country"
+                isClearable
+                className="rounded-lg"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: state.isFocused
+                      ? "2px solid #158a7b"
+                      : "1px solid #158a7b",
+                    boxShadow: "none", // Removes default focus ring
+                    padding: "4px", // Equivalent to Tailwind's `p-3`
+                    borderRadius: "0.5rem",
+                    backgroundColor: "white", // Ensures a clean background
+                    "&:hover": {
+                      border: state.isFocused
+                        ? "2px solid #158a7b"
+                        : "1px solid #158a7b", // Removes hover border change
+                    },
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    backgroundColor: "white", // Consistent white background
+                    color: "black",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "white", // No hover effect
+                    },
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    border: "1px solid #158a7b",
+                    borderRadius: "0.5rem",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: "black", // Text color of the selected value
+                  }),
+                }}
+              />
+              <Select
+                options={
+                  searchTermData.country
+                    ? getStates(searchTermData.country.value)
+                    : []
+                }
+                value={searchTermData.state}
+                onChange={(value) => handleLocationChange("state", value)}
+                placeholder="Select State"
+                isClearable
+                isDisabled={!searchTermData.country}
+                className="rounded-lg"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: state.isFocused
+                      ? "2px solid #158a7b"
+                      : "1px solid #158a7b",
+                    boxShadow: "none",
+                    padding: "4px", // Tailwind `p-3`
+                    borderRadius: "0.5rem",
+                    backgroundColor: state.isDisabled ? "#f9f9f9" : "white", // Lighter background for disabled state
+                    "&:hover": {
+                      border: state.isFocused
+                        ? "2px solid #158a7b"
+                        : "1px solid #158a7b",
+                    },
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    color: "black",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "white", // No hover effect
+                    },
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    border: "1px solid #158a7b",
+                    borderRadius: "0.5rem",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: "black",
+                  }),
+                }}
+              />
+              <Select
+                options={
+                  searchTermData.country && searchTermData.state
+                    ? getCities(
+                        searchTermData.country.value,
+                        searchTermData.state.value
+                      )
+                    : []
+                }
+                value={searchTermData.city}
+                onChange={(value) => handleLocationChange("city", value)}
+                placeholder="Select City"
+                isClearable
+                isDisabled={!searchTermData.state}
+                className="rounded-lg"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: state.isFocused
+                      ? "2px solid #158a7b"
+                      : "1px solid #158a7b",
+                    boxShadow: "none",
+                    padding: "4px", // Tailwind `p-3`
+                    borderRadius: "0.5rem",
+                    backgroundColor: state.isDisabled ? "#f9f9f9" : "white",
+                    "&:hover": {
+                      border: state.isFocused
+                        ? "2px solid #158a7b"
+                        : "1px solid #158a7b",
+                    },
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    backgroundColor: "white",
+                    color: "black",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "white",
+                    },
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    border: "1px solid #158a7b",
+                    borderRadius: "0.5rem",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: "black",
+                  }),
+                }}
+              />
+            </div>
           </div>
           {/* providign serch terms to filter data */}
           <div className="flex items-center flex-wrap gap-2 ">
@@ -242,7 +458,7 @@ const Search = () => {
             <select
               id="sort_order"
               onChange={handleChange}
-              defaultValue={"created_at_desc"}
+              defaultValue={"createdAt_desc"}
               className=" bg-slate-100 text-sm border border-[#147d6c] rounded-lg p-2 focus:outline-none focus:border-2"
             >
               <option value="regularPrice_desc">Price high to low</option>

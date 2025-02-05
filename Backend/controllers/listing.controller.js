@@ -20,20 +20,21 @@ export const createListing = async (req, res, next) => {
       furnished,
       offer,
       imagesLink,
-      userRef
+      userRef,
     } = req.body;
 
     // Validate discountPrice if offer is true
     if (offer && discountPrice >= regularPrice) {
       return res.status(400).json({
-        message: "Discount price must be less than regular price when an offer is active."
+        message:
+          "Discount price must be less than regular price when an offer is active.",
       });
     }
 
     // Ensure imagesLink contains at least one valid URL
     if (!Array.isArray(imagesLink) || imagesLink.length === 0) {
       return res.status(400).json({
-        message: "At least one valid image URL is required."
+        message: "At least one valid image URL is required.",
       });
     }
 
@@ -54,7 +55,7 @@ export const createListing = async (req, res, next) => {
       furnished,
       offer,
       imagesLink,
-      userRef
+      userRef,
     });
 
     // Send success response
@@ -132,6 +133,10 @@ export const getListings = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 9;
     // start index if there is now query then start index will be 0
     const startIndex = parseInt(req.query.startIndex) || 0;
+    // Extract location parameters
+    const country = req.query.country;
+    const state = req.query.state;
+    const city = req.query.city;
     // now to get listing data of offer or not offer we need to check if offer in not defined
     let offer = req.query.offer;
     if (offer === undefined || offer === "false") {
@@ -153,7 +158,25 @@ export const getListings = async (req, res, next) => {
       type = { $in: ["rent", "sale"] };
     }
     // to provide filter search term
-    let searchTerm = req.query.searchTerm || ""; // '' if ther is now search term use provide all listings to
+    const searchTerm = req.query.searchTerm || ""; // '' if ther is now search term use provide all listings to
+    // updated searchterm with address
+    const searchFilter = searchTerm
+      ? {
+          $or: [
+            { title: { $regex: searchTerm, $options: "i" } },
+            // { address: { $regex: searchTerm, $options: "i" } }
+          ],
+        }
+      : {};
+
+    // Backend Code (Modify locationFilter)
+    // If your database stores locations in different cases (e.g., "punjab" vs "Punjab"),
+    const locationFilter = {};
+    if (country)
+      locationFilter.country = { $regex: new RegExp(`^${country}$`, "i") };
+    if (state) locationFilter.state = { $regex: new RegExp(`^${state}$`, "i") };
+    if (city) locationFilter.city = { $regex: new RegExp(`^${city}$`, "i") };
+
     // to sort data accordign to query or createdAt
     let sort = req.query.sort || "createdAt";
     // sort order
@@ -164,7 +187,10 @@ export const getListings = async (req, res, next) => {
       /*regex is biltin functionality of mongodb
           which provide a way to search data based on regular expression
          "i" mean dont care about case sensitive*/
-      title: { $regex: searchTerm, $options: "i" },
+      // title: { $regex: searchTerm, $options: "i" },
+      // updated code 4/2/2025
+      ...searchFilter,
+      ...locationFilter,
       offer,
       furnished,
       parking,

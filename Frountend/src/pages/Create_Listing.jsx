@@ -476,10 +476,12 @@ const Create_Listing = () => {
           <p className="font-semibold">
             Images:
             <span className="font-normal text-gray-500 ml-2">
-              The first image will be the cover (max 6)
+              The first image will be
             </span>
+            <span className="font-normal text-gray-500 ml-2">
+              {''}the cover (max 6)</span>
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-3 lg:flex-row flex-col">
             <input
               onChange={(e) => setImages(e.target.files)}
               className="p-3 border border-[#158a7b] rounded"
