@@ -23,6 +23,7 @@ const Search = () => {
   const [listings, setListings] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const [showMore, setShowMore] = useState(false);
+  const [addressFilter, setAddressFilter] = useState("");
 
   // getting country state and city data
   const getCountries = () =>
@@ -477,7 +478,16 @@ const Search = () => {
       </div>
       {/* Listings Result */}
       <div className="flex-1">
-        <h1 className="text-2xl font-semibold border-b-2 p-3 text-slate-900 my-5">
+        <div className="p-3">
+          <input
+            type="text"
+            placeholder="Refine by address (e.g., 'Main St' or 'Apt 5B')"
+            value={addressFilter}
+            onChange={(e) => setAddressFilter(e.target.value)}
+            className="w-full p-2 border border-[#147d6c] rounded-lg focus:outline-none focus:border-2"
+          />
+        </div>
+        <h1 className="text-2xl font-semibold border-b-2 p-3 text-slate-900 my-3">
           Listing results:
         </h1>
         <div className="p-6 flex flex-wrap gap-4">
@@ -491,11 +501,21 @@ const Search = () => {
             </p>
           )}
           {/* now to make cards for each listing */}
-          {!loading &&
+          {/* {!loading &&
             listings &&
             listings.map((listing) => (
               <ListingItem key={listing._id} listing={listing} />
-            ))}
+            ))} */}
+          {!loading &&
+            listings
+              .filter((listing) =>
+                listing.address
+                  .toLowerCase()
+                  .includes(addressFilter.toLowerCase())
+              )
+              .map((listing) => (
+                <ListingItem key={listing._id} listing={listing} />
+              ))}
           {showMore && (
             <button
               onClick={handleShowMore}
